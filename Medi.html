@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MediManage Pro – Pharmacy management system</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef3f2;--surface:#fff;--ink:#10211f;--muted:#5d716e;--line:#d9e3e1;--brand:#0b6b5d;--brand-d:#084f45;--soft:#dcf0ec;--warn:#c2410c;--warn-soft:#ffe9dd;--ok:#15803d;--side:#0a2b27;--r:14px;--sh:0 1px 2px rgba(16,33,31,.06),0 8px 24px rgba(16,33,31,.06)}
+:root[data-theme=dark]{--bg:#0d1716;--surface:#142220;--ink:#e6f1ef;--muted:#92a9a5;--line:#243936;--brand:#2fb9a3;--brand-d:#5fd3c0;--soft:#173833;--warn:#fb923c;--warn-soft:#3a2416;--ok:#4ade80;--side:#081412;--sh:none}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+aside.side{background:var(--side);color:#cfe5e1;padding:1.25rem 1rem;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:.25rem}
+.logo{display:flex;align-items:center;gap:.6rem;font-weight:800;font-size:1.15rem;color:#fff;padding:.25rem .5rem 1.25rem}
+.logo i{width:32px;height:32px;border-radius:9px;background:#2fb9a3;position:relative;display:block}
+.logo i::before,.logo i::after{content:"";position:absolute;background:#fff;border-radius:2px;left:50%;top:50%;transform:translate(-50%,-50%)}
+.logo i::before{width:16px;height:4px}.logo i::after{width:4px;height:16px}
+.side a{display:block;padding:.65rem .85rem;border-radius:10px;color:inherit;text-decoration:none;font-weight:600;font-size:.94rem}
+.side a:hover{background:rgba(255,255,255,.08)}
+.side a.on{background:#2fb9a3;color:#06231f}
+.side .foot{margin-top:auto;font-size:.8rem;opacity:.7;padding:.5rem}
+main{padding:1.5rem clamp(1rem,3vw,2.25rem) 3rem;min-width:0}
+.top{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.25rem;flex-wrap:wrap}
+.top h1{margin:0;font-size:1.7rem;letter-spacing:-.03em}
+.top p{margin:0;color:var(--muted)}
+.btn{border:0;border-radius:10px;padding:.65rem 1.1rem;font-weight:700;cursor:pointer;background:var(--brand);color:#fff;transition:background .15s}
+.btn:hover{background:var(--brand-d)}.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.btn.danger{background:var(--warn-soft);color:var(--warn)}
+.btn.sm{padding:.35rem .7rem;font-size:.83rem;border-radius:8px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh)}
+.card-h{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid var(--line)}
+.card-h h2{margin:0;font-size:1.05rem}
+.pad{padding:1.25rem}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.25rem}
+.stat{padding:1.1rem 1.25rem}.stat b{display:block;font-size:1.8rem;letter-spacing:-.03em;line-height:1.15}.stat span{color:var(--muted);font-size:.86rem}
+.stat.w b{color:var(--warn)}
+.cols{display:grid;grid-template-columns:1.5fr 1fr;gap:1.25rem;margin-bottom:1.25rem}
+.pos{display:grid;grid-template-columns:1fr 380px;gap:1.25rem;align-items:start}
+input,select{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:.55rem .8rem;min-width:0}
+input:focus,select:focus{border-color:var(--brand)}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:.78rem;color:var(--muted);font-weight:600;padding:.65rem 1.25rem}
+td{padding:.7rem 1.25rem;border-top:1px solid var(--line);vertical-align:middle}
+tr.click{cursor:pointer}tr.click:hover td{background:var(--soft)}
+.tag{display:inline-block;font-size:.72rem;font-weight:700;padding:.1rem .55rem;border-radius:99px;background:var(--soft);color:var(--brand-d)}
+.tag.w{background:var(--warn-soft);color:var(--warn)}
+.acts{display:flex;gap:.4rem;justify-content:flex-end}
+.empty{padding:2rem;text-align:center;color:var(--muted)}
+.scroll{overflow-x:auto}
+.step{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.step button{border:0;background:var(--bg);width:28px;height:28px;cursor:pointer;font-weight:700}
+.step span{min-width:28px;text-align:center;font-weight:700;font-size:.9rem}
+.cart{position:sticky;top:1rem}
+.line{display:flex;justify-content:space-between;align-items:center;gap:.5rem;padding:.65rem 1.25rem;border-bottom:1px dashed var(--line)}
+.sum div{display:flex;justify-content:space-between;color:var(--muted);padding:.2rem 0}
+.sum .t{color:var(--ink);font-size:1.35rem;font-weight:800;border-top:2px solid var(--ink);margin-top:.4rem;padding-top:.5rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.inv{max-width:720px;margin:0 auto;padding:2rem}
+.inv h2{margin:0}.inv .meta{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin:1rem 0;color:var(--muted)}
+.bars text{fill:var(--muted);font-size:11px;font-family:inherit}.bars rect{fill:var(--brand)}
+.mini{display:flex;justify-content:space-between;padding:.6rem 1.25rem;border-top:1px solid var(--line);font-size:.92rem}
+.feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem}
+.chips span{background:var(--soft);color:var(--brand-d);padding:.3rem .8rem;border-radius:99px;font-weight:600;font-size:.88rem}
+dialog{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);color:var(--ink);padding:1.5rem;width:min(440px,92vw)}
+dialog::backdrop{background:rgba(5,15,13,.55)}
+dialog form{display:grid;gap:.75rem}dialog label{display:grid;gap:.25rem;font-weight:600;font-size:.88rem}
+#toasts{position:fixed;right:1rem;bottom:1rem;display:grid;gap:.5rem;z-index:50}
+.toast{background:var(--ink);color:var(--bg);padding:.7rem 1rem;border-radius:10px;font-weight:600;font-size:.9rem}
+[hidden]{display:none!important}
+.stats.five{grid-template-columns:repeat(5,1fr)}
+@media (max-width:1150px){.stats.five{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:900px){.stats.five{grid-template-columns:repeat(2,1fr)}}
+.bars rect.p{fill:#e0a100}.sub{color:var(--muted);font-size:.78rem}
+.side .tag{margin-left:.3rem}
+@media (max-width:900px){.app{grid-template-columns:1fr}aside.side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center}.side .foot,.side .logo{display:none}.stats{grid-template-columns:repeat(2,1fr)}.cols,.pos{grid-template-columns:1fr}.cart{position:static}}
+@media print{aside.side,.top,.noprint,#toasts{display:none!important}.app{display:block}.card{box-shadow:none;border:0}body{background:#fff;color:#000}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="logo"><i></i>MediManage Pro</div>
+    <a href="#/dashboard" data-r="dashboard">Dashboard</a>
+    <a href="#/inventory" data-r="inventory">Inventory</a>
+    <a href="#/billing" data-r="billing">New bill</a>
+    <a href="#/invoices" data-r="invoices">Invoices</a>
+    <a href="#/reports" data-r="reports">Reports</a>
+    <a href="#/alerts" data-r="alerts">Alerts <span class="tag w" id="badge" hidden></span></a>
+    <a href="#/about" data-r="about">About project</a>
+    <button class="btn ghost sm" id="theme" style="margin-top:.75rem">Toggle theme</button>
+    <div class="foot">Data is stored in your browser. <a href="#" id="reset" style="color:inherit">Reset demo data</a></div>
+  </aside>
+  <main id="view"></main>
+</div>
+
+<dialog id="dlg">
+  <form id="mForm">
+    <h2 id="mTitle" style="margin:0">Add medicine</h2>
+    <input type="hidden" id="mId">
+    <label>Name<input id="mName" required></label>
+    <label>Category<select id="mCat"><option>Pain relief</option><option>Antibiotic</option><option>Diabetes</option><option>Heart</option><option>Digestive</option><option>Thyroid</option><option>Other</option></select></label>
+    <div class="grid2" style="grid-template-columns:repeat(3,1fr)"><label>Price (₹)<input id="mPrice" type="number" min="1" step="0.5" required></label><label>Cost (₹)<input id="mCost" type="number" min="0" step="0.1" required></label><label>Stock<input id="mStock" type="number" min="0" required></label></div>
+    <div class="grid2"><label>Expiry date<input id="mExp" type="date" required></label><label>Reorder level<input id="mReorder" type="number" min="0" value="8" required></label></div>
+    <div class="grid2"><button type="button" class="btn ghost" id="mCancel">Cancel</button><button class="btn">Save medicine</button></div>
+  </form>
+</dialog>
+<dialog id="qrDlg"><div style="text-align:center"><h2 id="qrTitle" style="margin-top:0"></h2><div id="qrBox" style="display:inline-block;padding:10px;background:#fff;border-radius:8px"></div><p id="qrTxt" style="color:var(--muted);font-size:.85rem"></p><div class="grid2"><a class="btn ghost" id="qrDl" download="medimanage-qr.png" style="text-decoration:none">Download PNG</a><button class="btn" onclick="$('qrDlg').close()">Close</button></div></div></dialog>
+<dialog id="rsDlg"><form id="rsForm"><h2 style="margin:0">Restock <span id="rsName"></span></h2><input type="hidden" id="rsId"><label>Units received<input id="rsQty" type="number" min="1" required></label><label>Expiry of new batch<input id="rsExp" type="date" required></label><div class="grid2"><button type="button" class="btn ghost" onclick="$('rsDlg').close()">Cancel</button><button class="btn">Add stock</button></div></form></dialog>
+<dialog id="scanDlg"><h2 style="margin-top:0">Scan medicine QR</h2><video id="vid" playsinline muted style="width:100%;border-radius:10px;background:#000"></video><button class="btn ghost" style="margin-top:.75rem;width:100%" onclick="$('scanDlg').close()">Cancel</button></dialog>
+<div id="toasts" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+/* ---------- helpers ---------- */
+const KEY='medimanage.pro.v1', LOW=8, GST=0.05;
+const $=id=>document.getElementById(id);
+const rs=n=>'₹'+(Math.round(n*100)/100).toLocaleString('en-IN');
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const dstr=d=>new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+const addDays=n=>{const d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)};
+const daysTo=d=>Math.ceil((new Date(d)-new Date())/864e5);
+const toast=t=>{const d=document.createElement('div');d.className='toast';d.textContent=t;$('toasts').append(d);setTimeout(()=>d.remove(),2800)};
+const lv=m=>m.reorder??LOW;
+const unitCost=m=>m.cost??+(m.price*0.7).toFixed(1), itemCost=x=>x.cost??x.price*0.7;
+const dayKey=d=>new Date(d).toDateString(), pct=n=>n.toFixed(1)+'%';
+const invProfit=i=>i.sub-i.items.reduce((t,x)=>t+itemCost(x)*x.qty,0);
+function fin(list){const inc=list.reduce((t,i)=>t+i.sub,0),c=list.reduce((t,i)=>t+i.items.reduce((u,x)=>u+itemCost(x)*x.qty,0),0);return{n:list.length,units:list.reduce((t,i)=>t+i.items.reduce((u,x)=>u+x.qty,0),0),inc,cost:c,profit:inc-c,margin:inc?(inc-c)/inc*100:0}}
+const byDay=n=>[...Array(n)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-(n-1-i));return{d,...fin(S.invoices.filter(x=>dayKey(x.date)===dayKey(d)))}});
+let rangeDays=7,invQ='',invP='';
+const todayStrip=()=>{const t=fin(S.invoices.filter(i=>dayKey(i.date)===dayKey(new Date())));return`<div class="stats five">
+  <div class="card stat"><b>${rs(t.inc)}</b><span>Income today</span></div>
+  <div class="card stat"><b style="color:var(--ok)">${rs(t.profit)}</b><span>Profit today</span></div>
+  <div class="card stat"><b>${pct(t.margin)}</b><span>Margin today</span></div>
+  <div class="card stat"><b>${t.n}</b><span>Bills today</span></div>
+  <div class="card stat"><b>${t.units}</b><span>Items sold today</span></div></div>`};
+const sets=()=>({ex:S.meds.filter(m=>daysTo(m.exp)<0&&m.stock>0),soon:S.meds.filter(m=>{const d=daysTo(m.exp);return d>=0&&d<=60&&m.stock>0}),low:S.meds.filter(m=>m.stock<=lv(m)&&!(daysTo(m.exp)<0&&m.stock>0))});
+const updateBadge=()=>{const t=sets(),n=t.ex.length+t.soon.length+t.low.length;$('badge').textContent=n;$('badge').hidden=!n};
+function makeQR(el,text,size=160){if(!el)return;el.innerHTML='';if(typeof QRCode==='undefined'){el.textContent=text;return}new QRCode(el,{text,width:size,height:size,correctLevel:QRCode.CorrectLevel.M})}
+function showQR(title,text,note){$('qrTitle').textContent=title;$('qrTxt').textContent=note;makeQR($('qrBox'),text,180);$('qrDlg').showModal();setTimeout(()=>{const c=$('qrBox').querySelector('canvas');if(c)$('qrDl').href=c.toDataURL()},80)}
+let stream,scanTimer;
+async function startScan(){
+  if(!('BarcodeDetector' in window)){toast('Camera scan is not supported in this browser. Type the code instead.');return}
+  try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}})}catch(e){toast('Camera permission was denied');return}
+  const v=$('vid');v.srcObject=stream;await v.play();$('scanDlg').showModal();
+  const det=new BarcodeDetector({formats:['qr_code']});
+  scanTimer=setInterval(async()=>{const r=await det.detect(v).catch(()=>[]);if(r.length){$('scanDlg').close();addByCode(r[0].rawValue)}},600);
+}
+function addByCode(raw){
+  const c=raw.trim().toLowerCase(),m=S.meds.find(x=>c==='medi:'+x.id||x.name.toLowerCase()===c);
+  if(!m){toast('No medicine matches that code');return false}
+  if(daysTo(m.exp)<0){toast(m.name+' is expired and cannot be sold');return false}
+  if((cart[m.id]||0)>=m.stock){toast('No more '+m.name+' in stock');return false}
+  cart[m.id]=(cart[m.id]||0)+1;toast(m.name+' added to bill');if($('cartBox'))rerenderCart();return true;
+}
+
+/* ---------- data layer ---------- */
+function seed(){
+  const meds=[["Paracetamol","Pain relief",15,20,400],["Aspirin","Pain relief",12,15,300],["Ibuprofen","Pain relief",20,10,25],["Amoxicillin","Antibiotic",30,5,-12],["Ciprofloxacin","Antibiotic",25,0,500],["Metformin","Diabetes",18,12,350],["Atorvastatin","Heart",22,8,40],["Omeprazole","Digestive",17,14,280],["Losartan","Heart",19,11,420],["Levothyroxine","Thyroid",24,0,150]]
+   .map((m,i)=>({id:i+1,name:m[0],cat:m[1],price:m[2],stock:m[3],exp:addDays(m[4]),cost:+(m[2]*(0.6+(i%5)*0.04)).toFixed(1)}));
+  const invoices=[];let no=100;
+  for(let d=13;d>=0;d--)for(let k=0;k<2+(d%3);k++){
+    const a=meds[(d*3+k*2)%10],b=meds[(d+k*5+1)%10],items=[{name:a.name,price:a.price,cost:a.cost,qty:1+k},{name:b.name,price:b.price,cost:b.cost,qty:2}];
+    const sub=items.reduce((s,i)=>s+i.price*i.qty,0),dt=new Date();dt.setDate(dt.getDate()-d);
+    invoices.push({no:++no,date:dt.toISOString(),customer:['Walk-in','Rohan Patil','Sneha Joshi','Amit Kale'][(d+k)%4],pay:['Cash','UPI','Card'][(d+k)%3],items,sub,gst:sub*GST,total:sub*(1+GST)});
+  }
+  return {meds,invoices:invoices.reverse(),nextId:11,invNo:no+1};
+}
+let S;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!S||!Array.isArray(S.meds)||!Array.isArray(S.invoices))S=seed();
+S.meds.forEach(m=>{m.price=+m.price||0;m.stock=+m.stock||0;m.exp=m.exp||addDays(365);m.cat=m.cat||'Other'});
+S.invoices.forEach(i=>{i.items=i.items||[];i.sub=+i.sub||0;i.total=+i.total||0;i.customer=i.customer||'Walk-in';i.pay=i.pay||'Cash'});
+S.nextId=S.nextId||S.meds.reduce((a,m)=>Math.max(a,m.id),0)+1;S.invNo=S.invNo||S.invoices.reduce((a,i)=>Math.max(a,i.no),100)+1;
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+let cart={},customer='',pay='Cash';
+const cartRows=()=>Object.keys(cart).map(id=>({m:S.meds.find(x=>x.id==id),q:cart[id]})).filter(r=>r.m);
+const cartSub=()=>cartRows().reduce((s,r)=>s+r.m.price*r.q,0);
+
+/* ---------- pages ---------- */
+const head=(t,sub,btn='')=>`<div class="top"><div><h1>${t}</h1><p>${sub}</p></div>${btn}</div>`;
+
+function dashboard(){
+  const units=S.meds.reduce((t,m)=>t+m.stock,0),t=sets(),out=S.meds.filter(m=>m.stock===0),
+    td=fin(S.invoices.filter(i=>dayKey(i.date)===dayKey(new Date()))),days=byDay(7),max=Math.max(...days.map(x=>x.inc),1);
+  const bars=days.map((x,i)=>{const h=x.inc/max*120,p=Math.max(x.profit,0)/max*120,X=i*76+10;return`<rect x="${X}" y="${140-h}" width="26" height="${h}" rx="4"><title>Income ${rs(x.inc)}</title></rect><rect class="p" x="${X+28}" y="${140-p}" width="26" height="${p}" rx="4"><title>Profit ${rs(x.profit)}</title></rect><text x="${X+27}" y="160" text-anchor="middle">${x.d.toLocaleDateString('en-IN',{weekday:'short'})}</text>`}).join('');
+  const tg=(m,x)=>`<div class="mini"><span>${esc(m.name)}</span><span class="tag w">${x}</span></div>`;
+  return head('Dashboard','Income, profit and stock at a glance.','<a class="btn" href="#/billing">Create bill</a>')+
+  `<div class="stats">
+    <div class="card stat"><b>${rs(td.inc)}</b><span>Income today (excl. GST)</span></div>
+    <div class="card stat"><b style="color:var(--ok)">${rs(td.profit)}</b><span>Profit today</span></div>
+    <div class="card stat"><b>${pct(td.margin)}</b><span>Profit margin today</span></div>
+    <div class="card stat"><b>${td.n}</b><span>Bills today</span></div></div>
+  <div class="stats">
+    <div class="card stat"><b>${S.meds.length}</b><span>Medicines listed</span></div>
+    <div class="card stat"><b>${units}</b><span>Units in stock</span></div>
+    <div class="card stat w"><b>${t.low.length}</b><span>Low or out of stock</span></div>
+    <div class="card stat w"><b>${out.length}</b><span>Out of stock</span></div></div>
+  <div class="cols">
+    <div class="card"><div class="card-h"><h2>Income and profit, last 7 days</h2><span style="font-size:.82rem;color:var(--muted)"><b style="color:var(--brand)">■</b> Income <b style="color:#e0a100">■</b> Profit</span></div><div class="pad"><svg class="bars" viewBox="0 0 540 170" width="100%" role="img" aria-label="Income and profit per day">${bars}</svg></div></div>
+    <div class="card"><div class="card-h"><h2>Needs attention</h2><a class="btn ghost sm" href="#/alerts">Open alerts</a></div>
+      ${t.ex.map(m=>tg(m,'Expired')).join('')}${t.soon.map(m=>tg(m,'Expires in '+daysTo(m.exp)+'d')).join('')}${t.low.filter(m=>m.stock>0).map(m=>tg(m,m.stock+' left')).join('')}
+      ${t.ex.length+t.soon.length+t.low.length-out.length>0?'':'<div class="empty">All stock levels and expiry dates look fine.</div>'}</div></div>
+  <div class="cols">
+    <div class="card"><div class="card-h"><h2>Out of stock</h2><span style="font-size:.85rem;color:var(--muted)">${out.length} items</span></div>
+      ${out.map(m=>`<div class="mini"><span><b>${esc(m.name)}</b> <span class="sub">${esc(m.cat)}</span></span><button class="btn sm" data-a="restock" data-id="${m.id}">Restock</button></div>`).join('')||'<div class="empty">Every medicine is in stock.</div>'}</div>
+    <div class="card"><div class="card-h"><h2>Recent invoices</h2><a class="btn ghost sm" href="#/invoices">View all</a></div>
+      <div class="scroll"><table><thead><tr><th>Invoice</th><th>Customer</th><th>Total</th></tr></thead><tbody>
+      ${S.invoices.slice(0,5).map(i=>`<tr class="click" data-a="open" data-id="${i.no}"><td>#MEDI${i.no}</td><td>${esc(i.customer)}</td><td>${rs(i.total)}</td></tr>`).join('')}</tbody></table></div></div></div>`;
+}
+function reports(){
+  const days=byDay(rangeDays).reverse(),keys=new Set(days.map(x=>dayKey(x.d))),inR=S.invoices.filter(i=>keys.has(dayKey(i.date))),tot=fin(inR),top={},cats={},pays={};
+  inR.forEach(i=>{pays[i.pay]=(pays[i.pay]||0)+i.sub;i.items.forEach(x=>{const pr=(x.price-itemCost(x))*x.qty,inc=x.price*x.qty,c=(S.meds.find(m=>m.name===x.name)||{}).cat||'Other';
+    const o=top[x.name]||(top[x.name]={qty:0,inc:0,profit:0});o.qty+=x.qty;o.inc+=inc;o.profit+=pr;
+    const k=cats[c]||(cats[c]={qty:0,inc:0,profit:0});k.qty+=x.qty;k.inc+=inc;k.profit+=pr})});
+  const best=Object.entries(top).sort((a,b)=>b[1].profit-a[1].profit).slice(0,6),cl=Object.entries(cats).sort((a,b)=>b[1].profit-a[1].profit),bd=[...days].sort((a,b)=>b.profit-a.profit)[0];
+  const tbl=(h,rows)=>`<div class="scroll"><table><thead><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${rows||`<tr><td colspan="${h.length}" class="empty">No sales in this range.</td></tr>`}</tbody></table></div>`;
+  const rw=([n,o])=>`<tr><td><b>${esc(n)}</b></td><td>${o.qty}</td><td>${rs(o.inc)}</td><td style="color:var(--ok)">${rs(o.profit)}</td><td>${pct(o.inc?o.profit/o.inc*100:0)}</td></tr>`;
+  return head('Reports','Daily income, cost, profit and margin.',`<select id="rng" aria-label="Range">${[7,14,30].map(n=>`<option value="${n}" ${n===rangeDays?'selected':''}>Last ${n} days</option>`).join('')}</select>`)+todayStrip()+
+  `<div class="stats">
+    <div class="card stat"><b>${rs(tot.inc)}</b><span>Income, last ${rangeDays} days</span></div>
+    <div class="card stat"><b>${rs(tot.cost)}</b><span>Cost of goods sold</span></div>
+    <div class="card stat"><b style="color:var(--ok)">${rs(tot.profit)}</b><span>Profit</span></div>
+    <div class="card stat"><b>${pct(tot.margin)}</b><span>Profit margin</span></div></div>
+  <div class="stats">
+    <div class="card stat"><b>${tot.n}</b><span>Bills · ${tot.units} items sold</span></div>
+    <div class="card stat"><b>${rs(tot.n?tot.inc/tot.n:0)}</b><span>Average bill</span></div>
+    <div class="card stat"><b>${rs(tot.inc/rangeDays)}</b><span>Average income per day</span></div>
+    <div class="card stat"><b>${bd&&bd.profit>0?rs(bd.profit):'–'}</b><span>Best day${bd&&bd.profit>0?' · '+dstr(bd.d):''}</span></div></div>
+  <div class="card" style="margin-bottom:1.25rem"><div class="card-h"><h2>Daily report</h2><div class="chips">${['Cash','UPI','Card'].map(p=>`<span>${p}: ${rs(pays[p]||0)}</span>`).join('')}</div></div>
+    ${tbl(['Date','Bills','Items','Income','Cost','Profit','Margin'],days.map(x=>`<tr><td>${dstr(x.d)}</td><td>${x.n}</td><td>${x.units}</td><td>${rs(x.inc)}</td><td>${rs(x.cost)}</td><td style="color:var(--ok);font-weight:700">${rs(x.profit)}</td><td>${x.n?pct(x.margin):'–'}</td></tr>`).join('')+
+    `<tr style="background:var(--soft)"><td><b>Total</b></td><td><b>${tot.n}</b></td><td><b>${tot.units}</b></td><td><b>${rs(tot.inc)}</b></td><td><b>${rs(tot.cost)}</b></td><td><b>${rs(tot.profit)}</b></td><td><b>${pct(tot.margin)}</b></td></tr>`)}</div>
+  <div class="cols"><div class="card"><div class="card-h"><h2>Top medicines by profit</h2></div>${tbl(['Medicine','Units','Income','Profit','Margin'],best.map(rw).join(''))}</div>
+  <div class="card"><div class="card-h"><h2>By category</h2></div>${tbl(['Category','Units','Income','Profit','Margin'],cl.map(rw).join(''))}</div></div>`;
+}
+const invFilter=(q='',cat='',st='')=>{const f={low:m=>m.stock<=lv(m),soon:m=>{const d=daysTo(m.exp);return d>=0&&d<=60},expired:m=>daysTo(m.exp)<0,out:m=>m.stock===0}[st];return S.meds.filter(m=>m.name.toLowerCase().includes(q.toLowerCase())&&(!cat||m.cat===cat)&&(!f||f(m)))};
+function invRows(q,cat,st){const l=invFilter(q,cat,st);if(!l.length)return invRows0(q,cat,st);const u=l.reduce((a,m)=>a+m.stock,0),vc=l.reduce((a,m)=>a+unitCost(m)*m.stock,0),vr=l.reduce((a,m)=>a+m.price*m.stock,0);
+  return invRows0(q,cat,st)+`<tr style="background:var(--soft)"><td colspan="3"><b>Total (${l.length} medicines)</b></td><td><b>${u} units</b></td><td colspan="2"><b>Value ${rs(vc)} at cost · ${rs(vr)} at selling price</b></td></tr>`}
+function invRows0(q='',cat='',st=''){
+  const f={low:m=>m.stock<=lv(m),soon:m=>{const d=daysTo(m.exp);return d>=0&&d<=60},expired:m=>daysTo(m.exp)<0,out:m=>m.stock===0}[st];
+  const list=S.meds.filter(m=>m.name.toLowerCase().includes(q.toLowerCase())&&(!cat||m.cat===cat)&&(!f||f(m)));
+  if(!list.length)return'<tr><td colspan="6" class="empty">No medicines found. Change the filter or add a new medicine.</td></tr>';
+  return list.map(m=>{const dd=daysTo(m.exp);return`<tr><td><b>${esc(m.name)}</b></td><td>${esc(m.cat)}</td><td>${rs(m.price)}<div class="sub">cost ${rs(unitCost(m))} · ${pct((m.price-unitCost(m))/m.price*100)}</div></td>
+    <td>${m.stock} ${m.stock<=lv(m)?`<span class="tag w">${m.stock?'Low':'Out'}</span>`:''}</td>
+    <td>${dstr(m.exp)} ${dd<=60?`<span class="tag w">${dd<0?'Expired':dd+'d'}</span>`:''}</td>
+    <td><div class="acts"><button class="btn ghost sm" data-a="qr" data-id="${m.id}">QR</button><button class="btn ghost sm" data-a="edit" data-id="${m.id}">Edit</button><button class="btn danger sm" data-a="del" data-id="${m.id}">Delete</button></div></td></tr>`}).join('');
+}
+function inventory(){
+  const cats=[...new Set(S.meds.map(m=>m.cat))],c=S.meds.reduce((a,m)=>a+unitCost(m)*m.stock,0),r=S.meds.reduce((a,m)=>a+m.price*m.stock,0),exv=sets().ex.reduce((a,m)=>a+unitCost(m)*m.stock,0);
+  return head('Inventory','Add, edit and track every medicine.','<button class="btn" data-a="new">Add medicine</button>')+todayStrip()+
+  `<div class="stats">
+    <div class="card stat"><b>${rs(c)}</b><span>Stock value (at cost)</span></div>
+    <div class="card stat"><b>${rs(r)}</b><span>Stock value (at selling price)</span></div>
+    <div class="card stat"><b style="color:var(--ok)">${rs(r-c)}</b><span>Potential profit · ${pct(r?(r-c)/r*100:0)} margin</span></div>
+    <div class="card stat w"><b>${rs(exv)}</b><span>Expired stock (at cost)</span></div></div>
+  <div class="card"><div class="card-h"><h2>${S.meds.length} medicines</h2><div style="display:flex;gap:.5rem;flex-wrap:wrap">
+    <input type="search" id="q" placeholder="Search by name" aria-label="Search"><select id="sf" aria-label="Status"><option value="">All status</option><option value="low">Low stock</option><option value="soon">Expiring soon</option><option value="expired">Expired</option><option value="out">Out of stock</option></select>
+    <select id="cf" aria-label="Category"><option value="">All categories</option>${cats.map(x=>`<option>${esc(x)}</option>`).join('')}</select></div></div>
+    <div class="scroll"><table><thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Expiry</th><th></th></tr></thead><tbody id="rows">${invRows()}</tbody></table></div></div>`;
+}
+function pickRows(q=''){
+  const l=S.meds.filter(m=>m.name.toLowerCase().includes(q.toLowerCase()));
+  return l.map(m=>{const left=m.stock-(cart[m.id]||0);return`<tr><td><b>${esc(m.name)}</b><div style="color:var(--muted);font-size:.8rem">${esc(m.cat)}</div></td><td>${rs(m.price)}</td><td>${left}</td>
+    <td><div class="acts"><button class="btn sm" data-a="add" data-id="${m.id}" ${left<=0||daysTo(m.exp)<0?'disabled':''}>Add</button></div></td></tr>`}).join('')||'<tr><td colspan="4" class="empty">No match.</td></tr>';
+}
+function cartHtml(){
+  const r=cartRows(),sub=cartSub(),pr=r.reduce((t,x)=>t+(x.m.price-unitCost(x.m))*x.q,0);
+  return(r.length?r.map(({m,q})=>`<div class="line"><div><b>${esc(m.name)}</b><div style="color:var(--muted);font-size:.8rem">${rs(m.price)} × ${q} = ${rs(m.price*q)}</div></div>
+    <div class="step"><button data-a="dec" data-id="${m.id}" aria-label="Decrease">−</button><span>${q}</span><button data-a="inc" data-id="${m.id}" aria-label="Increase">+</button></div></div>`).join(''):'<div class="empty">Cart is empty. Add medicines from the list.</div>')+
+  `<div class="pad sum"><div><span>Subtotal</span><span>${rs(sub)}</span></div><div><span>GST (5%)</span><span>${rs(sub*GST)}</span></div><div class="t"><span>Total</span><span>${rs(sub*(1+GST))}</span></div><div><span>Est. profit on this bill</span><span style="color:var(--ok)">${rs(pr)} · ${pct(sub?pr/sub*100:0)}</span></div></div>`;
+}
+function billing(){
+  return head('New bill','Pick medicines, add customer details, generate the invoice.')+todayStrip()+
+  `<div class="pos"><div class="card"><div class="card-h"><h2>Medicines</h2><div style="display:flex;gap:.5rem;flex-wrap:wrap"><input type="search" id="pq" placeholder="Search medicine" aria-label="Search"><input id="code" placeholder="Scan or type code (MEDI:3)" aria-label="Scan code"><button class="btn ghost sm" data-a="scan">Scan QR</button></div></div>
+    <div class="scroll"><table><thead><tr><th>Name</th><th>Price</th><th>In stock</th><th></th></tr></thead><tbody id="pick">${pickRows()}</tbody></table></div></div>
+   <div class="card cart"><div class="card-h"><h2>Current bill</h2></div>
+    <div class="pad grid2"><label style="font-size:.85rem;font-weight:600">Customer<input id="cust" value="${esc(customer)}" placeholder="Walk-in"></label>
+    <label style="font-size:.85rem;font-weight:600">Payment<select id="pay">${['Cash','UPI','Card'].map(p=>`<option ${p===pay?'selected':''}>${p}</option>`).join('')}</select></label></div>
+    <div id="cartBox">${cartHtml()}</div>
+    <div class="pad grid2"><button class="btn ghost" data-a="clear">Clear</button><button class="btn" data-a="checkout" id="co">Generate invoice</button></div></div></div>`;
+}
+
+function invRowsHtml(){
+  const q=invQ.trim().toLowerCase(),l=S.invoices.filter(i=>(!invP||i.pay===invP)&&(!q||i.customer.toLowerCase().includes(q)||('medi'+i.no).includes(q)));
+  if(!l.length)return'<tr><td colspan="9" class="empty">No invoices match your search.</td></tr>';
+  const t=fin(l);
+  return l.map(i=>{const p=invProfit(i);return`<tr class="click" data-a="open" data-id="${i.no}"><td>#MEDI${i.no}</td><td>${esc(i.customer)}</td><td>${dstr(i.date)}</td><td>${i.pay}</td><td>${i.items.reduce((a,x)=>a+x.qty,0)}</td><td>${rs(i.sub)}</td><td>${rs(i.total)}</td><td style="color:var(--ok)">${rs(p)}</td><td>${pct(i.sub?p/i.sub*100:0)}</td></tr>`}).join('')+
+  `<tr style="background:var(--soft)"><td colspan="4"><b>Total (${t.n} invoices)</b></td><td><b>${t.units}</b></td><td><b>${rs(t.inc)}</b></td><td><b>${rs(l.reduce((a,i)=>a+i.total,0))}</b></td><td><b>${rs(t.profit)}</b></td><td><b>${pct(t.margin)}</b></td></tr>`;
+}
+function invoices(){
+  const all=fin(S.invoices);
+  return head('Invoices','Every bill with income, profit and margin.','<a class="btn" href="#/billing">New bill</a>')+todayStrip()+
+  `<div class="stats five">
+    <div class="card stat"><b>${S.invoices.length}</b><span>Total invoices</span></div>
+    <div class="card stat"><b>${rs(all.inc)}</b><span>Total income (excl. GST)</span></div>
+    <div class="card stat"><b style="color:var(--ok)">${rs(all.profit)}</b><span>Total profit</span></div>
+    <div class="card stat"><b>${pct(all.margin)}</b><span>Overall margin</span></div>
+    <div class="card stat"><b>${rs(all.n?all.inc/all.n:0)}</b><span>Average bill</span></div></div>
+  <div class="card"><div class="card-h"><h2>Invoice history</h2><div style="display:flex;gap:.5rem;flex-wrap:wrap">
+    <input type="search" id="iq" value="${esc(invQ)}" placeholder="Search customer or invoice" aria-label="Search invoices">
+    <select id="ip" aria-label="Payment">${['','Cash','UPI','Card'].map(p=>`<option value="${p}" ${p===invP?'selected':''}>${p||'All payments'}</option>`).join('')}</select></div></div>
+    <div class="scroll"><table><thead><tr><th>Invoice</th><th>Customer</th><th>Date</th><th>Payment</th><th>Items</th><th>Income</th><th>Total (GST)</th><th>Profit</th><th>Margin</th></tr></thead><tbody id="irows">${invRowsHtml()}</tbody></table></div></div>`;
+}
+function invoiceDetail(no){
+  const i=S.invoices.find(x=>x.no==no);if(!i)return head('Not found','This invoice does not exist.','<a class="btn" href="#/invoices">Back to invoices</a>');
+  return `<div class="top noprint"><a class="btn ghost" href="#/invoices">Back</a><button class="btn" onclick="print()">Print invoice</button></div>
+  <div class="card inv"><h2>MediManage Pharmacy</h2><div class="meta"><span>Invoice #MEDI${i.no}<br>${dstr(i.date)}</span><span>Billed to: <b>${esc(i.customer)}</b><br>Payment: ${i.pay}</span></div>
+  <table><thead><tr><th style="padding-left:0">Item</th><th>Price</th><th>Qty</th><th style="text-align:right">Amount</th></tr></thead><tbody>
+  ${i.items.map(x=>`<tr><td style="padding-left:0">${esc(x.name)}</td><td>${rs(x.price)}</td><td>${x.qty}</td><td style="text-align:right">${rs(x.price*x.qty)}</td></tr>`).join('')}</tbody></table>
+  <div class="sum" style="max-width:260px;margin:1rem 0 0 auto"><div><span>Subtotal</span><span>${rs(i.sub)}</span></div><div><span>GST (5%)</span><span>${rs(i.gst)}</span></div><div class="t"><span>Total</span><span>${rs(i.total)}</span></div></div><div style="display:flex;align-items:center;gap:1rem;margin-top:1.25rem"><div id="invQr"></div><small style="color:var(--muted)">Scan to verify this invoice.<br>Code: MEDI${i.no}</small></div><div class="noprint" style="margin-top:1rem;padding-top:.75rem;border-top:1px dashed var(--line);color:var(--muted);font-size:.88rem">Internal: profit on this bill ${rs(invProfit(i))} · margin ${pct(i.sub?invProfit(i)/i.sub*100:0)}</div></div>`;
+}
+function about(){
+  const f=[["Inventory CRUD","Add, edit, delete and search medicines with category, price, stock and expiry."],["Smart alerts","Low-stock and near-expiry warnings on the dashboard and in the inventory table."],["Billing engine","Cart with stock validation, GST calculation, and automatic stock deduction on checkout."],["Invoice history","Every bill is stored, searchable by date, and printable from the browser."],["Analytics","Seven-day revenue chart rendered as SVG from invoice data, with no chart library."],["Persistence","State is saved to localStorage and survives page reloads."]];
+  return head('About this project','A pharmacy management system built as a single-page app.')+
+  `<div class="card pad" style="margin-bottom:1.25rem"><p style="margin-top:0;max-width:70ch">MediManage Pro helps a small pharmacy track stock, bill customers and review sales without a spreadsheet. It uses a hash-based router to switch between five pages without reloading, and one data layer that every page reads from.</p>
+  <div class="chips"><span>HTML5</span><span>CSS3 variables</span><span>Vanilla JavaScript (ES6)</span><span>SVG charts</span><span>localStorage</span><span>Hash routing</span><span>Responsive layout</span><span>Dark mode</span></div></div>
+  <div class="feat">${f.map(x=>`<div class="card pad"><b>${x[0]}</b><p style="margin:.4rem 0 0;color:var(--muted)">${x[1]}</p></div>`).join('')}</div>
+  <div class="card pad" style="margin-top:1.25rem"><b>Built by Pranjal Kandi</b><p style="margin:.3rem 0 0;color:var(--muted)">Computer Engineering student, Data Analytics and Full Stack Developer.</p></div>`;
+}
+
+/* ---------- router ---------- */
+function alertsPage(){
+  const {ex,soon,low}=sets(),loss=ex.reduce((t,m)=>t+m.price*m.stock,0),log=S.disposed||[];
+  const row=(m,tag,btn)=>`<div class="mini"><span><b>${esc(m.name)}</b> <span style="color:var(--muted)">${m.stock} units · exp ${dstr(m.exp)}</span></span><span class="acts"><span class="tag w">${tag}</span>${btn}</span></div>`;
+  const sec=(t,sub,body,empty)=>`<div class="card" style="margin-bottom:1.25rem"><div class="card-h"><h2>${t}</h2><span style="color:var(--muted);font-size:.88rem">${sub}</span></div>${body||`<div class="empty">${empty}</div>`}</div>`;
+  return head('Alerts','Expired, expiring and low-stock medicines in one place.','<button class="btn ghost" data-a="copyList">Copy reorder list</button>')+
+  sec('Expired','Remove from shelf. Stock value at risk: '+rs(loss),ex.map(m=>row(m,'Expired '+(-daysTo(m.exp))+'d ago',`<button class="btn danger sm" data-a="discard" data-id="${m.id}">Discard</button>`)).join(''),'No expired medicines on the shelf.')+
+  sec('Expiring within 60 days','Sell these first',soon.map(m=>row(m,daysTo(m.exp)+' days left',`<button class="btn ghost sm" data-a="qr" data-id="${m.id}">QR</button>`)).join(''),'Nothing is close to expiry.')+
+  sec('Out of stock','Restock to resume selling',low.filter(m=>m.stock===0).map(m=>row(m,'Out of stock',`<button class="btn sm" data-a="restock" data-id="${m.id}">Restock</button>`)).join(''),'Nothing is out of stock.')+
+  sec('Low stock','At or below reorder level',low.filter(m=>m.stock>0).map(m=>row(m,m.stock?'Reorder at '+lv(m):'Out of stock',`<button class="btn sm" data-a="restock" data-id="${m.id}">Restock</button>`)).join(''),'All medicines are above their reorder level.')+
+  (log.length?sec('Discarded stock','Disposal log',log.slice(0,8).map(l=>`<div class="mini"><span>${esc(l.name)} × ${l.qty}</span><span style="color:var(--muted)">${dstr(l.date)} · ${rs(l.value)}</span></div>`).join('')):'');
+}
+const routes={dashboard,inventory,billing,invoices,alerts:alertsPage,reports,about};
+function route(){
+  const [,r='dashboard',arg]=(cur||'#/dashboard').split('/');
+  const name=routes[r]?r:'dashboard';
+  try{$('view').innerHTML=r==='invoices'&&arg?invoiceDetail(arg):routes[name]()}catch(err){console.error(err);$('view').innerHTML='<div class="card pad"><h2>This page could not load</h2><p style="color:var(--muted)">Your saved data may be from an older version. Resetting the demo data fixes it.</p><button class="btn" data-a="reset">Reset demo data</button></div>'}
+  document.querySelectorAll('.side a').forEach(a=>a.classList.toggle('on',a.dataset.r===name));
+  document.title=name[0].toUpperCase()+name.slice(1)+' · MediManage Pro';
+  if(r==='invoices'&&arg){const i=S.invoices.find(x=>x.no==arg);if(i)makeQR($('invQr'),`MEDIMANAGE|MEDI${i.no}|${i.customer}|${i.date.slice(0,10)}|${i.total.toFixed(2)}`,96)}
+  updateBadge();
+  scrollTo(0,0);
+}
+let cur=location.hash||'#/dashboard';
+function go(h){try{history.replaceState(null,'',h)}catch(e){}cur=h;route()}
+addEventListener('hashchange',()=>{cur=location.hash||'#/dashboard';route()});
+document.addEventListener('click',e=>{const a=e.target.closest('a[href^="#/"]');if(a){e.preventDefault();go(a.getAttribute('href'))}});
+
+/* ---------- events ---------- */
+const rerenderCart=()=>{$('cartBox').innerHTML=cartHtml();$('pick').innerHTML=pickRows($('pq').value)};
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-a]');if(!b)return;
+  const id=+b.dataset.id,m=S.meds.find(x=>x.id===id),a=b.dataset.a;
+  if(a==='new'){$('mTitle').textContent='Add medicine';$('mForm').reset();$('mId').value='';$('mExp').value=addDays(365);$('dlg').showModal()}
+  if(a==='edit'){$('mTitle').textContent='Edit medicine';$('mId').value=m.id;$('mName').value=m.name;$('mCat').value=m.cat;$('mPrice').value=m.price;$('mCost').value=unitCost(m);$('mStock').value=m.stock;$('mExp').value=m.exp;$('mReorder').value=lv(m);$('dlg').showModal()}
+  if(a==='del'&&confirm('Delete '+m.name+'?')){S.meds=S.meds.filter(x=>x.id!==id);save();route();toast(m.name+' deleted')}
+  if(a==='open')go('#/invoices/'+b.dataset.id);
+  if(a==='reset')$('reset').click();
+  if(a==='qr')showQR(m.name,'MEDI:'+m.id,'Code MEDI:'+m.id+' · expires '+dstr(m.exp));
+  if(a==='scan')startScan();
+  if(a==='discard'&&confirm('Discard '+m.stock+' expired units of '+m.name+'?')){(S.disposed=S.disposed||[]).unshift({name:m.name,qty:m.stock,value:m.stock*m.price,date:new Date().toISOString()});m.stock=0;save();route();toast(m.name+' discarded and logged')}
+  if(a==='restock'){$('rsId').value=id;$('rsName').textContent=m.name;$('rsQty').value=Math.max(lv(m)*3-m.stock,1);$('rsExp').value=daysTo(m.exp)<0?addDays(365):m.exp;$('rsDlg').showModal()}
+  if(a==='copyList'){const t='Reorder list\n'+S.meds.filter(m=>m.stock<=lv(m)).map(m=>m.name+': '+m.stock+' left, suggested order '+Math.max(lv(m)*3-m.stock,1)).join('\n');navigator.clipboard.writeText(t).then(()=>toast('Reorder list copied'),()=>toast('Copy failed'))}
+  if(a==='add'){if((cart[id]||0)<m.stock)cart[id]=(cart[id]||0)+1;rerenderCart()}
+  if(a==='inc'){if(cart[id]<m.stock)cart[id]++;else toast('No more '+m.name+' in stock');rerenderCart()}
+  if(a==='dec'){if(--cart[id]<=0)delete cart[id];rerenderCart()}
+  if(a==='clear'){cart={};rerenderCart()}
+  if(a==='checkout'){
+    const r=cartRows();if(!r.length){toast('Add at least one medicine first');return}
+    const sub=cartSub(),inv={no:S.invNo++,date:new Date().toISOString(),customer:($('cust').value.trim()||'Walk-in'),pay:$('pay').value,
+      items:r.map(({m,q})=>({name:m.name,price:m.price,cost:unitCost(m),qty:q})),sub,gst:sub*GST,total:sub*(1+GST)};
+    r.forEach(({m,q})=>{m.stock-=q;if(m.stock<=lv(m))toast(m.name+(m.stock?' is low: '+m.stock+' left':' is now out of stock'))});S.invoices.unshift(inv);save();cart={};customer='';pay='Cash';
+    toast('Invoice #MEDI'+inv.no+' created');go('#/invoices/'+inv.no);
+  }
+});
+document.addEventListener('input',e=>{
+  if(['q','cf','sf'].includes(e.target.id))$('rows').innerHTML=invRows($('q').value,$('cf').value,$('sf').value);
+  if(e.target.id==='pq')$('pick').innerHTML=pickRows(e.target.value);
+  if(e.target.id==='cust')customer=e.target.value;
+  if(e.target.id==='pay')pay=e.target.value;
+  if(e.target.id==='rng'){rangeDays=+e.target.value;route()}
+  if(e.target.id==='iq'||e.target.id==='ip'){invQ=$('iq').value;invP=$('ip').value;$('irows').innerHTML=invRowsHtml()}
+});
+$('mForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const o={name:$('mName').value.trim(),cat:$('mCat').value,price:parseFloat($('mPrice').value),cost:parseFloat($('mCost').value),stock:parseInt($('mStock').value,10),exp:$('mExp').value,reorder:parseInt($('mReorder').value,10)||0},id=+$('mId').value;
+  if(S.meds.some(m=>m.id!==id&&m.name.toLowerCase()===o.name.toLowerCase())){toast(o.name+' already exists');return}
+  if(id)Object.assign(S.meds.find(m=>m.id===id),o);else S.meds.push({id:S.nextId++,...o});
+  save();$('dlg').close();route();toast(o.name+' saved');
+});
+$('mCancel').onclick=()=>$('dlg').close();
+$('theme').onclick=()=>{const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark'};
+$('reset').onclick=e=>{e.preventDefault();if(confirm('Reset all data to the demo set?')){S=seed();cart={};save();route();toast('Demo data restored')}};
+$('rsForm').addEventListener('submit',e=>{
+  e.preventDefault();const m=S.meds.find(x=>x.id==$('rsId').value),ne=$('rsExp').value,keep=m.stock>0&&daysTo(m.exp)>=0;
+  m.exp=keep&&m.exp<ne?m.exp:ne;m.stock+=parseInt($('rsQty').value,10);save();$('rsDlg').close();route();toast(m.name+' restocked');
+});
+$('scanDlg').addEventListener('close',()=>{clearInterval(scanTimer);if(stream)stream.getTracks().forEach(t=>t.stop());stream=null});
+document.addEventListener('keydown',e=>{if(e.target.id==='code'&&e.key==='Enter'){e.preventDefault();if(addByCode(e.target.value))e.target.value=''}});
+route();
+{const t=sets();if(t.ex.length)toast(t.ex.length+' expired medicine'+(t.ex.length>1?'s':'')+' on the shelf. Open Alerts.')}
+</script>
+</body>
+</html>
